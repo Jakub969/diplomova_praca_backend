@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="oprava cesty ku datasete">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/train_model.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,8 +92,19 @@
       <workItem from="1762249365573" duration="2441000" />
       <workItem from="1762253201468" duration="1043000" />
       <workItem from="1762255187540" duration="2190000" />
-      <workItem from="1762257854595" duration="2188000" />
+      <workItem from="1762257854595" duration="2272000" />
+      <workItem from="1762367961085" duration="20000" />
+      <workItem from="1762367997293" duration="67000" />
     </task>
+    <task id="LOCAL-00001" summary="oprava cesty ku datasete">
+      <option name="closed" value="true" />
+      <created>1762260108166</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1762260108166</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -111,5 +120,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="oprava cesty ku datasete" />
+    <option name="LAST_COMMIT_MESSAGE" value="oprava cesty ku datasete" />
   </component>
 </project>
