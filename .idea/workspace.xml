@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="používanie pycolmap">
+    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="upravenie loss pri trenovani">
+      <change afterPath="$PROJECT_DIR$/full_inference.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -109,6 +110,7 @@
       <workItem from="1762856364478" duration="1202000" />
       <workItem from="1762885854072" duration="298000" />
       <workItem from="1763312928547" duration="2904000" />
+      <workItem from="1763322635370" duration="908000" />
     </task>
     <task id="LOCAL-00001" summary="oprava cesty ku datasete">
       <option name="closed" value="true" />
@@ -142,7 +144,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762886126162</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="upravenie loss pri trenovani">
+      <option name="closed" value="true" />
+      <created>1763322704153</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1763322704153</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,6 +174,7 @@
     <MESSAGE value="pridanie colabu" />
     <MESSAGE value="zmeny v modeli" />
     <MESSAGE value="používanie pycolmap" />
-    <option name="LAST_COMMIT_MESSAGE" value="používanie pycolmap" />
+    <MESSAGE value="upravenie loss pri trenovani" />
+    <option name="LAST_COMMIT_MESSAGE" value="upravenie loss pri trenovani" />
   </component>
 </project>
