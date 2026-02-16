@@ -1,6 +1,5 @@
 import open3d as o3d
 import numpy as np
-from sympy.physics.units import length
 
 INPUT_PLY = "points3D.ply"
 OUTPUT_PLY = "points_tree_only_dbscan.ply"
@@ -40,11 +39,41 @@ if y_min < 0:
 else:
     length_of_y = y_max - y_min
 
-y_threshold = length_of_y * 0.355
+y_threshold = length_of_y * 0.05
 print("Dolná hranica: ", y_min + y_threshold)
 print("Horná hranica: ", y_max - y_threshold)
 
-mask = points[:, 1] <= y_max - y_threshold
+# hustota bodov spodku vs vrchu
+bottom_density = np.sum(points[:,1] < y_min + y_threshold)
+print("Bottom density before:", bottom_density)
+top_density = np.sum(points[:,1] >= y_min + y_threshold)
+print("Top density before:", top_density)
+
+if top_density > bottom_density:
+    # strom je hore nohami, otočíme
+    R = pcd.get_rotation_matrix_from_xyz((np.pi, 0, 0))
+    pcd.rotate(R, center=(0, 0, 0))
+
+y_min = points[:, 1].min()
+y_max = points[:, 1].max()
+
+#cela plocha
+if y_min < 0:
+    length_of_y = abs(y_min) + abs(y_max)
+else:
+    length_of_y = y_max - y_min
+
+y_threshold = length_of_y * 0.365
+print("Dolná hranica: ", y_min + y_threshold)
+print("Horná hranica: ", y_max - y_threshold)
+
+# hustota bodov spodku vs vrchu
+bottom_density = np.sum(points[:,1] < y_min + y_threshold)
+print("Bottom density after:", bottom_density)
+top_density = np.sum(points[:,1] >= y_min + y_threshold)
+print("Top density after:", top_density)
+
+mask = points[:, 1] > y_min + y_threshold
 pcd = pcd.select_by_index(np.where(mask)[0])
 
 distances = pcd.compute_nearest_neighbor_distance()
