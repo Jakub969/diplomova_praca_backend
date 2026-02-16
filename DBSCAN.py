@@ -1,8 +1,9 @@
 import open3d as o3d
 import numpy as np
+from sympy.physics.units import length
 
 INPUT_PLY = "points3D.ply"
-OUTPUT_PLY = "points_tree_only_ransac.ply"
+OUTPUT_PLY = "points_tree_only_dbscan.ply"
 
 # --------------------------------------------------
 # 1. Load point cloud
@@ -17,44 +18,51 @@ else:
 
 print(f"Loaded {len(pcd.points)} points")
 
-# --------------------------------------------------
-# 2. Remove ground plane (RANSAC)
-# --------------------------------------------------
-plane_model, inliers = pcd.segment_plane(
-    distance_threshold=0.15,   # nastav podľa mierky (COLMAP!)
-    ransac_n=3,
-    num_iterations=1000
-)
+points = np.asarray(pcd.points)
 
-[a, b, c, d] = plane_model
-print(f"Plane equation: {a:.3f}x + {b:.3f}y + {c:.3f}z + {d:.3f} = 0")
+print("Y min:", points[:,1].min())
+print("Y max:", points[:,1].max())
 
-ground = pcd.select_by_index(inliers)
-nonground = pcd.select_by_index(inliers, invert=True)
-
-print(f"Ground removed: {len(ground.points)} points")
-print(f"Remaining: {len(nonground.points)} points")
+extent = pcd.get_axis_aligned_bounding_box().get_extent()
+print("Extent X,Y,Z:", extent)
 
 # --------------------------------------------------
-# 3. Remove outliers (noise)
+# 2. Remove ground
 # --------------------------------------------------
-nonground, ind = nonground.remove_radius_outlier(
-    nb_points=10,
-    radius=0.05
-)
+points = np.asarray(pcd.points)
 
-print(f"After outlier removal: {len(nonground.points)} points")
+y_min = points[:, 1].min()
+y_max = points[:, 1].max()
+
+#cela plocha
+if y_min < 0:
+    length_of_y = abs(y_min) + abs(y_max)
+else:
+    length_of_y = y_max - y_min
+
+y_threshold = length_of_y * 0.355
+print("Dolná hranica: ", y_min + y_threshold)
+print("Horná hranica: ", y_max - y_threshold)
+
+mask = points[:, 1] <= y_max - y_threshold
+pcd = pcd.select_by_index(np.where(mask)[0])
+
+distances = pcd.compute_nearest_neighbor_distance()
+avg_dist = np.mean(distances)
+print("Avg NN distance:", avg_dist)
 
 # --------------------------------------------------
 # 4. Clustering (DBSCAN)
 # --------------------------------------------------
+eps = avg_dist * 5
 labels = np.array(
-    nonground.cluster_dbscan(
-        eps=0.75,      # závisí od mierky!
-        min_points=100,
+    pcd.cluster_dbscan(
+        eps=eps,
+        min_points=50,
         print_progress=True
     )
 )
+
 
 max_label = labels.max()
 print(f"Found {max_label + 1} clusters")
@@ -62,10 +70,12 @@ print(f"Found {max_label + 1} clusters")
 # --------------------------------------------------
 # 5. Select tree cluster
 # --------------------------------------------------
+max_label = labels.max()
+
 clusters = []
 for i in range(max_label + 1):
     idx = np.where(labels == i)[0]
-    cluster = nonground.select_by_index(idx)
+    cluster = pcd.select_by_index(idx)
     clusters.append(cluster)
 
 # Heuristika: strom = najväčší cluster
