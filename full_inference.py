@@ -13,7 +13,9 @@ class PointNet2SemSegMSG(nn.Module):
             npoint=1024,
             radii=[0.1, 0.2, 0.4],
             nsamples=[16, 32, 128],
-            mlps=[[32, 32, 64], [64, 64, 128], [64, 96, 128]],
+            mlps=[[0, 32, 32, 64],
+                  [0, 64, 64, 128],
+                  [0, 64, 96, 128]],
             use_xyz=True
         )
 
@@ -21,7 +23,8 @@ class PointNet2SemSegMSG(nn.Module):
             npoint=256,
             radii=[0.4, 0.8],
             nsamples=[32, 64],
-            mlps=[[128, 128, 256], [128, 196, 256]],
+            mlps=[[320, 128, 128, 256],
+                  [320, 128, 196, 256]],
             use_xyz=True
         )
 
@@ -69,4 +72,4 @@ def predict_pointcloud(model, ply_path, n_points=62673):
 if __name__ == "__main__":
     model = load_model("best_pointnet2_model.pth")
 
-    pts, preds = predict_pointcloud(model, "input.ply")
+    pts, preds = predict_pointcloud(model, "points_tree_only_dbscan.ply")
