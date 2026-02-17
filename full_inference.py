@@ -1,7 +1,7 @@
 import torch
 import open3d as o3d
 import numpy as np
-from pointnet2_ops.pointnet2_modules import PointnetFPModule, PointnetSAModuleMSG
+from pointnet2_ops.pointnet2_modules import PointnetFPModule,PointnetSAModuleMSG
 import torch.nn as nn
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -73,3 +73,22 @@ if __name__ == "__main__":
     model = load_model("best_pointnet2_model.pth")
 
     pts, preds = predict_pointcloud(model, "points_tree_only_dbscan.ply")
+    # vytvor nový point cloud
+    pcd_out = o3d.geometry.PointCloud()
+    pcd_out.points = o3d.utility.Vector3dVector(pts)
+
+    # farby podľa tried
+    colors = np.zeros((len(preds), 3))
+
+    # trieda 0 = červená
+    colors[preds == 0] = [1, 0, 0]
+
+    # trieda 1 = zelená
+    colors[preds == 1] = [0, 1, 0]
+
+    pcd_out.colors = o3d.utility.Vector3dVector(colors)
+
+    # uloženie
+    o3d.io.write_point_cloud("prediction_output.ply", pcd_out)
+
+    print("Hotovo. Výstup uložený ako prediction_output.ply")
