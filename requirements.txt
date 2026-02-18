@@ -8,3 +8,5 @@ tqdm
 open3d
 scikit-learn
 pycolmap
+fastapi
+celery
