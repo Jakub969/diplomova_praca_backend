@@ -1,6 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
 from uuid import uuid4
-from pathlib import Path
 from settings import JOBS_DIR
 from tasks import process_video
 
