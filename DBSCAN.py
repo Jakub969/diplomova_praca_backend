@@ -1,8 +1,8 @@
 import open3d as o3d
 import numpy as np
 
-INPUT_PLY = "jobs/93259f1c1293404891108465e86e3566/dense/fused.ply"
-OUTPUT_PLY = "points_tree_only_dbscan1.ply"
+INPUT_PLY = "points3D.ply"
+OUTPUT_PLY = "points_tree_only_dbscan2.ply"
 
 # --------------------------------------------------
 # 1. Load point cloud
@@ -24,7 +24,7 @@ print("Y max:", points[:,1].max())
 
 extent = pcd.get_axis_aligned_bounding_box().get_extent()
 print("Extent X,Y,Z:", extent)
-
+'''
 # --------------------------------------------------
 # 2. Remove ground
 # --------------------------------------------------
@@ -64,7 +64,7 @@ if y_min < 0:
 else:
     length_of_y = y_max - y_min
 
-y_threshold = length_of_y * 0.365
+y_threshold = length_of_y * 0.05
 print("Dolná hranica: ", y_min + y_threshold)
 print("Horná hranica: ", y_max - y_threshold)
 
@@ -76,12 +76,12 @@ print("Top density after:", top_density)
 
 mask = points[:, 1] > y_min + y_threshold
 pcd = pcd.select_by_index(np.where(mask)[0])
-
+'''
 # --------------------------------------------------
 # CONDITIONAL DOWNSAMPLING (len pre výpočet)
 # --------------------------------------------------
 
-MAX_POINTS = 150_000
+MAX_POINTS = 150000
 
 pcd_full = pcd  # originál si uložíme
 num_points = len(pcd.points)
@@ -95,7 +95,7 @@ if num_points > MAX_POINTS:
     bbox = pcd.get_axis_aligned_bounding_box()
     scene_size = max(bbox.get_extent())
 
-    voxel_size = scene_size / 300  # stabilné pre stromy
+    voxel_size = scene_size / 800
     print("Voxel size:", voxel_size)
 
     pcd_work = pcd.voxel_down_sample(voxel_size)
@@ -120,13 +120,17 @@ print("Points used for DBSCAN:", len(pcd_work.points))
 # --------------------------------------------------
 # 4. Clustering (DBSCAN)
 # --------------------------------------------------
-
-eps = avg_dist * 5
+if num_points > MAX_POINTS:
+    eps = avg_dist*2.5
+    min_points = 50
+else:
+    eps = avg_dist*2
+    min_points = 5
 
 labels = np.array(
     pcd_work.cluster_dbscan(
         eps=eps,
-        min_points=50,
+        min_points=min_points,
         print_progress=True
     )
 )
@@ -140,12 +144,21 @@ idx = np.where(labels == largest_label)[0]
 tree_cluster_down = pcd_work.select_by_index(idx)
 
 print("Largest cluster (processing cloud):", len(tree_cluster_down.points))
-if num_points > MAX_POINTS:
-    bbox = tree_cluster_down.get_axis_aligned_bounding_box()
-    indices = bbox.get_point_indices_within_bounding_box(pcd_full.points)
-    tree_pcd = pcd_full.select_by_index(indices)
-else:
-    tree_pcd = tree_cluster_down
+tree_points = np.asarray(tree_cluster_down.points)
+
+pcd_tree = o3d.geometry.PointCloud()
+pcd_tree.points = o3d.utility.Vector3dVector(tree_points)
+
+tree_kdtree = o3d.geometry.KDTreeFlann(pcd_tree)
+
+indices_full = []
+
+for i, point in enumerate(pcd_full.points):
+    [k, idx, _] = tree_kdtree.search_radius_vector_3d(point, eps)
+    if k > 0:
+        indices_full.append(i)
+
+tree_pcd = pcd_full.select_by_index(indices_full)
 
 print("Final tree size:", len(tree_pcd.points))
 # --------------------------------------------------
