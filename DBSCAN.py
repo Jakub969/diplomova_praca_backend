@@ -1,8 +1,8 @@
 import open3d as o3d
 import numpy as np
 
-INPUT_PLY = "points3D.ply"
-OUTPUT_PLY = "points_tree_only_dbscan.ply"
+INPUT_PLY = "jobs/93259f1c1293404891108465e86e3566/dense/fused.ply"
+OUTPUT_PLY = "points_tree_only_dbscan1.ply"
 
 # --------------------------------------------------
 # 1. Load point cloud
@@ -53,6 +53,7 @@ if top_density > bottom_density:
     # strom je hore nohami, otočíme
     R = pcd.get_rotation_matrix_from_xyz((np.pi, 0, 0))
     pcd.rotate(R, center=(0, 0, 0))
+    points = np.asarray(pcd.points)
 
 y_min = points[:, 1].min()
 y_max = points[:, 1].max()
@@ -76,43 +77,77 @@ print("Top density after:", top_density)
 mask = points[:, 1] > y_min + y_threshold
 pcd = pcd.select_by_index(np.where(mask)[0])
 
-distances = pcd.compute_nearest_neighbor_distance()
-avg_dist = np.mean(distances)
-print("Avg NN distance:", avg_dist)
+# --------------------------------------------------
+# CONDITIONAL DOWNSAMPLING (len pre výpočet)
+# --------------------------------------------------
+
+MAX_POINTS = 150_000
+
+pcd_full = pcd  # originál si uložíme
+num_points = len(pcd.points)
+
+print("Points before clustering:", num_points)
+
+if num_points > MAX_POINTS:
+    print("Using voxel downsampling for processing only...")
+
+    # automatický voxel podľa veľkosti scény
+    bbox = pcd.get_axis_aligned_bounding_box()
+    scene_size = max(bbox.get_extent())
+
+    voxel_size = scene_size / 300  # stabilné pre stromy
+    print("Voxel size:", voxel_size)
+
+    pcd_work = pcd.voxel_down_sample(voxel_size)
+    points_work = np.asarray(pcd_work.points)
+
+    sample_size = min(50000, len(points_work))
+    idx = np.random.choice(len(points_work), sample_size, replace=False)
+    sample_pcd = pcd_work.select_by_index(idx)
+
+    distances = sample_pcd.compute_nearest_neighbor_distance()
+    avg_dist = np.mean(distances)
+
+    print("Avg NN distance:", avg_dist)
+else:
+    print("Downsampling not needed")
+    pcd_work = pcd
+    distances = pcd.compute_nearest_neighbor_distance()
+    avg_dist = np.mean(distances)
+    print("Avg NN distance:", avg_dist)
+print("Points used for DBSCAN:", len(pcd_work.points))
 
 # --------------------------------------------------
 # 4. Clustering (DBSCAN)
 # --------------------------------------------------
+
 eps = avg_dist * 5
+
 labels = np.array(
-    pcd.cluster_dbscan(
+    pcd_work.cluster_dbscan(
         eps=eps,
         min_points=50,
         print_progress=True
     )
 )
 
+valid = labels >= 0
+unique, counts = np.unique(labels[valid], return_counts=True)
 
-max_label = labels.max()
-print(f"Found {max_label + 1} clusters")
+largest_label = unique[np.argmax(counts)]
+idx = np.where(labels == largest_label)[0]
 
-# --------------------------------------------------
-# 5. Select tree cluster
-# --------------------------------------------------
-max_label = labels.max()
+tree_cluster_down = pcd_work.select_by_index(idx)
 
-clusters = []
-for i in range(max_label + 1):
-    idx = np.where(labels == i)[0]
-    cluster = pcd.select_by_index(idx)
-    clusters.append(cluster)
+print("Largest cluster (processing cloud):", len(tree_cluster_down.points))
+if num_points > MAX_POINTS:
+    bbox = tree_cluster_down.get_axis_aligned_bounding_box()
+    indices = bbox.get_point_indices_within_bounding_box(pcd_full.points)
+    tree_pcd = pcd_full.select_by_index(indices)
+else:
+    tree_pcd = tree_cluster_down
 
-# Heuristika: strom = najväčší cluster
-clusters.sort(key=lambda c: len(c.points), reverse=True)
-tree_pcd = clusters[0]
-
-print(f"Tree cluster size: {len(tree_pcd.points)} points")
-
+print("Final tree size:", len(tree_pcd.points))
 # --------------------------------------------------
 # 6. Save result
 # --------------------------------------------------
