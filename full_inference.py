@@ -69,26 +69,23 @@ def predict_pointcloud(model, ply_path, n_points=62673):
 
     return pts, preds
 
-if __name__ == "__main__":
-    model = load_model("best_pointnet2_model.pth")
+import sys
 
-    pts, preds = predict_pointcloud(model, "points_tree_only_dbscan.ply")
-    # vytvor nový point cloud
+if __name__ == "__main__":
+    input_ply = sys.argv[1]
+    output_ply = sys.argv[2]
+    weights_path = sys.argv[3]
+
+    model = load_model(weights_path)
+    pts, preds = predict_pointcloud(model, input_ply)
+
     pcd_out = o3d.geometry.PointCloud()
     pcd_out.points = o3d.utility.Vector3dVector(pts)
 
-    # farby podľa tried
     colors = np.zeros((len(preds), 3))
-
-    # trieda 0 = červená
     colors[preds == 0] = [1, 0, 0]
-
-    # trieda 1 = zelená
     colors[preds == 1] = [0, 1, 0]
 
     pcd_out.colors = o3d.utility.Vector3dVector(colors)
 
-    # uloženie
-    o3d.io.write_point_cloud("prediction_output.ply", pcd_out)
-
-    print("Hotovo. Výstup uložený ako prediction_output.ply")
+    o3d.io.write_point_cloud(output_ply, pcd_out)

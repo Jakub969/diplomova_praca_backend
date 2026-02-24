@@ -4,10 +4,11 @@ from pathlib import Path
 
 from worker import celery
 from settings import JOBS_DIR, FFMPEG_PATH
+from DBSCAN import filter_point_cloud
 
 
 @celery.task(name="tasks.process_video")
-def process_video(job_id: str, video_path_str: str):
+def process_video(job_id: str, video_path_str: str, quality):
 
     job_dir = JOBS_DIR / job_id
     image_dir = job_dir / "images"
@@ -63,22 +64,44 @@ def process_video(job_id: str, video_path_str: str):
     # -------------------------
     # 5) Dense reconstruction
     # -------------------------
-    pycolmap.undistort_images(
-        output_path=dense_dir,
-        input_path=model_path,
-        image_path=image_dir
-    )
+    if quality == "dense":
+        pycolmap.undistort_images(
+            output_path=dense_dir,
+            input_path=model_path,
+            image_path=image_dir
+        )
 
-    pycolmap.patch_match_stereo(
-        workspace_path=dense_dir
-    )
+        pycolmap.patch_match_stereo(
+            workspace_path=dense_dir
+        )
 
-    pycolmap.stereo_fusion(
-        output_path=dense_dir / "fused.ply",
-        workspace_path=dense_dir
-    )
+        pycolmap.stereo_fusion(
+            output_path=dense_dir / "fused.ply",
+            workspace_path=dense_dir
+        )
+        input_ply = dense_dir / "fused.ply"
+    else:
+        sparse_ply = sparse_dir / "points3D.ply"
 
-    return {
-        "status": "done",
-        "ply": str(dense_dir / "fused.ply")
-    }
+        subprocess.run([
+            "colmap", "model_converter",
+            "--input_path", str(model_path),
+            "--output_path", str(sparse_ply),
+            "--output_type", "PLY"
+        ], check=True)
+
+        input_ply = sparse_ply
+    output_ply = job_dir / "filtered_scene.ply"
+    filter_point_cloud(str(input_ply), str(output_ply))
+    prediction_ply = job_dir / "prediction_output.ply"
+
+    subprocess.run([
+        "docker", "run", "--rm",
+        "--gpus", "all",
+        "-v", f"{job_dir}:/workspace/job",
+        "pointnet2_inference:latest",
+        "python", "full_inference.py",
+        "/workspace/job/filtered_scene.ply",
+        "/workspace/job/prediction_output.ply",
+        "/workspace/best_pointnet2_model.pth"
+    ], check=True)
