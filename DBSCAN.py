@@ -2,7 +2,7 @@ import open3d as o3d
 import numpy as np
 
 INPUT_PLY = "points3D.ply"
-OUTPUT_PLY = "points_tree_only_dbscan2.ply"
+OUTPUT_PLY = "points_tree_only_dbscan4.ply"
 
 # --------------------------------------------------
 # 1. Load point cloud
@@ -24,7 +24,7 @@ print("Y max:", points[:,1].max())
 
 extent = pcd.get_axis_aligned_bounding_box().get_extent()
 print("Extent X,Y,Z:", extent)
-'''
+
 # --------------------------------------------------
 # 2. Remove ground
 # --------------------------------------------------
@@ -39,7 +39,7 @@ if y_min < 0:
 else:
     length_of_y = y_max - y_min
 
-y_threshold = length_of_y * 0.05
+y_threshold = length_of_y * 0.15
 print("Dolná hranica: ", y_min + y_threshold)
 print("Horná hranica: ", y_max - y_threshold)
 
@@ -55,28 +55,6 @@ if top_density > bottom_density:
     pcd.rotate(R, center=(0, 0, 0))
     points = np.asarray(pcd.points)
 
-y_min = points[:, 1].min()
-y_max = points[:, 1].max()
-
-#cela plocha
-if y_min < 0:
-    length_of_y = abs(y_min) + abs(y_max)
-else:
-    length_of_y = y_max - y_min
-
-y_threshold = length_of_y * 0.05
-print("Dolná hranica: ", y_min + y_threshold)
-print("Horná hranica: ", y_max - y_threshold)
-
-# hustota bodov spodku vs vrchu
-bottom_density = np.sum(points[:,1] < y_min + y_threshold)
-print("Bottom density after:", bottom_density)
-top_density = np.sum(points[:,1] >= y_min + y_threshold)
-print("Top density after:", top_density)
-
-mask = points[:, 1] > y_min + y_threshold
-pcd = pcd.select_by_index(np.where(mask)[0])
-'''
 # --------------------------------------------------
 # CONDITIONAL DOWNSAMPLING (len pre výpočet)
 # --------------------------------------------------
@@ -121,11 +99,11 @@ print("Points used for DBSCAN:", len(pcd_work.points))
 # 4. Clustering (DBSCAN)
 # --------------------------------------------------
 if num_points > MAX_POINTS:
-    eps = avg_dist*2.5
     min_points = 50
 else:
-    eps = avg_dist*2
     min_points = 5
+
+eps = avg_dist*2
 
 labels = np.array(
     pcd_work.cluster_dbscan(
@@ -161,8 +139,45 @@ for i, point in enumerate(pcd_full.points):
 tree_pcd = pcd_full.select_by_index(indices_full)
 
 print("Final tree size:", len(tree_pcd.points))
+bbox = tree_pcd.get_axis_aligned_bounding_box()
+min_bound = bbox.min_bound
+max_bound = bbox.max_bound
+points_full = np.asarray(pcd_full.points)
+mask = (
+    (points_full[:, 0] >= min_bound[0]) &
+    (points_full[:, 0] <= max_bound[0]) &
+    (points_full[:, 2] >= min_bound[2]) &
+    (points_full[:, 2] <= max_bound[2])
+)
+
+indices = np.where(mask)[0]
+filtered = pcd_full.select_by_index(indices)
+
+filtered_np = np.asarray(filtered.points)
+bbox = filtered.get_axis_aligned_bounding_box()
+
+y_min = filtered_np[:, 1].min()
+y_max = filtered_np[:, 1].max()
+if y_min < 0:
+    if num_points > MAX_POINTS:
+        y_threshold = (y_max + abs(y_min))*0.45
+    else:
+        y_threshold = (y_max + abs(y_min)) * 0.17
+else:
+    if num_points > MAX_POINTS:
+        y_threshold = (y_max - y_min)*0.45
+    else:
+        y_threshold = (y_max - y_min)*0.17
+
+mask = filtered_np[:, 1] >= y_min + y_threshold
+filtered_np = filtered_np[mask]
+
+filtered_pcd = o3d.geometry.PointCloud()
+filtered_pcd.points = o3d.utility.Vector3dVector(filtered_np)
+
+print("Filtered size:", len(filtered_pcd.points))
 # --------------------------------------------------
 # 6. Save result
 # --------------------------------------------------
-o3d.io.write_point_cloud(OUTPUT_PLY, tree_pcd)
+o3d.io.write_point_cloud(OUTPUT_PLY, filtered_pcd)
 print("Saved:", OUTPUT_PLY)
