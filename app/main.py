@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import FileResponse
 from uuid import uuid4
 from settings import JOBS_DIR
 from tasks import process_video
@@ -25,6 +26,11 @@ async def upload_video(file: UploadFile = File(...)):
         "task_id": task.id
     }
 
+
+@app.get("/result/{job_id}")
+def get_result(job_id: str):
+    file_path = JOBS_DIR / job_id / "prediction_output.glb"
+    return FileResponse(file_path, media_type="model/gltf-binary")
 
 @app.get("/status/{task_id}")
 def check_status(task_id: str):

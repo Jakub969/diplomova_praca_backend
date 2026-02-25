@@ -4,10 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="pridanie pycolmap pre analyzu videa cez api">
+    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="prepojenie pipeline">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KPConv_inference.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/worker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/tasks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/convert_to_ply.py" beforeDir="false" afterPath="$PROJECT_DIR$/convert_to_glb.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/full_inference.py" beforeDir="false" afterPath="$PROJECT_DIR$/full_inference.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/point_clouds_from_images.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_inference_tree_extract.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,8 +105,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.30387.173" />
-        <option value="bundled-python-sdk-4762d8aabb82-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.173" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.31033.139" />
+        <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
       </set>
     </attachedChunks>
   </component>
@@ -134,6 +139,10 @@
       <workItem from="1771315321925" duration="10346000" />
       <workItem from="1771403330217" duration="8662000" />
       <workItem from="1771488615653" duration="10026000" />
+      <workItem from="1771834954414" duration="2596000" />
+      <workItem from="1771837811741" duration="410000" />
+      <workItem from="1771838388149" duration="18042000" />
+      <workItem from="1772003594656" duration="3520000" />
     </task>
     <task id="LOCAL-00001" summary="oprava cesty ku datasete">
       <option name="closed" value="true" />
@@ -223,7 +232,39 @@
       <option name="project" value="LOCAL" />
       <updated>1771415326634</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="dbscan uprava aj pre väčšie ply subory">
+      <option name="closed" value="true" />
+      <created>1771837570260</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1771837570260</updated>
+    </task>
+    <task id="LOCAL-00013" summary="zmena parametrov pri filtracii">
+      <option name="closed" value="true" />
+      <created>1771843380253</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1771843380253</updated>
+    </task>
+    <task id="LOCAL-00014" summary="testovanie rôznych parametrov pre DBSCAN">
+      <option name="closed" value="true" />
+      <created>1771927520781</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1771927520781</updated>
+    </task>
+    <task id="LOCAL-00015" summary="prepojenie pipeline">
+      <option name="closed" value="true" />
+      <created>1771931870979</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1771931870979</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -252,7 +293,11 @@
     <MESSAGE value="inference funguje!!!" />
     <MESSAGE value="vytvorenie readme pre jednoduché spustenie" />
     <MESSAGE value="pridanie pycolmap pre analyzu videa cez api" />
-    <option name="LAST_COMMIT_MESSAGE" value="pridanie pycolmap pre analyzu videa cez api" />
+    <MESSAGE value="dbscan uprava aj pre väčšie ply subory" />
+    <MESSAGE value="zmena parametrov pri filtracii" />
+    <MESSAGE value="testovanie rôznych parametrov pre DBSCAN" />
+    <MESSAGE value="prepojenie pipeline" />
+    <option name="LAST_COMMIT_MESSAGE" value="prepojenie pipeline" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/diplomova_praca_backend$train_model.coverage" NAME="train_model Coverage Results" MODIFIED="1771232337098" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

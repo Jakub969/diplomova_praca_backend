@@ -1,7 +1,10 @@
 import subprocess
 import pycolmap
 from pathlib import Path
+import open3d as o3d
+import numpy as np
 
+from convert_to_glb import convert_ply_to_glb
 from worker import celery
 from settings import JOBS_DIR, FFMPEG_PATH
 from DBSCAN import filter_point_cloud
@@ -83,13 +86,19 @@ def process_video(job_id: str, video_path_str: str, quality):
     else:
         sparse_ply = sparse_dir / "points3D.ply"
 
-        subprocess.run([
-            "colmap", "model_converter",
-            "--input_path", str(model_path),
-            "--output_path", str(sparse_ply),
-            "--output_type", "PLY"
-        ], check=True)
+        reconstruction = pycolmap.Reconstruction(sparse_dir)
 
+        points = []
+        colors = []
+
+        for point3D in reconstruction.points3D.values():
+            points.append(point3D.xyz)
+            colors.append(point3D.color / 255.0)
+
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(np.array(points))
+        pcd.colors = o3d.utility.Vector3dVector(np.array(colors))
+        o3d.io.write_point_cloud(sparse_ply, pcd)
         input_ply = sparse_ply
     output_ply = job_dir / "filtered_scene.ply"
     filter_point_cloud(str(input_ply), str(output_ply))
@@ -105,3 +114,6 @@ def process_video(job_id: str, video_path_str: str, quality):
         "/workspace/job/prediction_output.ply",
         "/workspace/best_pointnet2_model.pth"
     ], check=True)
+
+    glb_path = job_dir / "prediction_output.glb"
+    convert_ply_to_glb(input_ply, glb_path)

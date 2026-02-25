@@ -83,8 +83,8 @@ if __name__ == "__main__":
     pcd_out.points = o3d.utility.Vector3dVector(pts)
 
     colors = np.zeros((len(preds), 3))
-    colors[preds == 0] = [1, 0, 0]
-    colors[preds == 1] = [0, 1, 0]
+    colors[preds == 0] = [0, 1, 0]
+    colors[preds == 1] = [1, 0, 0]
 
     pcd_out.colors = o3d.utility.Vector3dVector(colors)
 
