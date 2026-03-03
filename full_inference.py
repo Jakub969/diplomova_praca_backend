@@ -51,6 +51,13 @@ def predict_pointcloud(model, ply_path, n_points=62673):
     pcd = o3d.io.read_point_cloud(ply_path)
     pts = np.asarray(pcd.points, dtype=np.float32)
 
+    # === NORMALIZÁCIA ===
+    centroid = np.mean(pts, axis=0)
+    pts = pts - centroid
+    max_dist = np.max(np.sqrt(np.sum(pts ** 2, axis=1)))
+    pts = pts / max_dist
+    print("Vstupné dáta boli normalizované")
+
     # Resampling (ako v datasete)
     min_len = len(pts)
     if min_len >= n_points:
@@ -65,7 +72,7 @@ def predict_pointcloud(model, ply_path, n_points=62673):
 
     with torch.no_grad():
         logits = model(pts_tensor)       # (1, num_classes, N)
-        preds = torch.argmax(logits, dim=1).squeeze(0).cpu().numpy()
+        preds = torch.argmax(logits, dim=1).squeeze(0).cuda().numpy()
 
     return pts, preds
 

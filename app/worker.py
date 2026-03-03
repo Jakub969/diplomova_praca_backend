@@ -11,5 +11,4 @@ celery.conf.task_routes = {
     "tasks.process_video": {"queue": "gpu_queue"}
 }
 import tasks
-##celery -A worker worker --loglevel=info -Q gpu_queue --concurrency=1
-
+##celery -A worker worker --pool=solo --loglevel=info -Q gpu_queue

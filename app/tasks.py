@@ -10,14 +10,14 @@ from settings import JOBS_DIR, FFMPEG_PATH
 from DBSCAN import filter_point_cloud
 
 
-@celery.task(name="tasks.process_video")
-def process_video(job_id: str, video_path_str: str, quality: str):
+@celery.task(name="tasks.process_video", bind=True)
+def process_video(self, job_id: str, video_path_str: str, quality: str):
     total_progress = 0
 
     def update(p):
         nonlocal total_progress
         total_progress += p
-        celery.update_state(
+        self.update_state(
             state="PROGRESS",
             meta={"progress": total_progress}
         )

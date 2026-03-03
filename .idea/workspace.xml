@@ -4,15 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="prepojenie pipeline">
+    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="uprava pre zobrazenie progresu">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KPConv_inference.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DBSCAN.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/DBSCAN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/tasks.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/convert_to_ply.py" beforeDir="false" afterPath="$PROJECT_DIR$/convert_to_glb.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/worker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/convert_to_glb.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/convert_to_glb.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/full_inference.py" beforeDir="false" afterPath="$PROJECT_DIR$/full_inference.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/point_clouds_from_images.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/run_inference_tree_extract.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +71,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app" />
       <recent name="C:\Users\jakub\Desktop\Jakub\diplomova_praca\diplomova_praca_backend\models" />
       <recent name="C:\Users\jakub\Desktop\Jakub\diplomova_praca\diplomova_praca_backend" />
     </key>
@@ -142,7 +142,9 @@
       <workItem from="1771834954414" duration="2596000" />
       <workItem from="1771837811741" duration="410000" />
       <workItem from="1771838388149" duration="18042000" />
-      <workItem from="1772003594656" duration="3520000" />
+      <workItem from="1772003594656" duration="6843000" />
+      <workItem from="1772010890503" duration="40000" />
+      <workItem from="1772526281621" duration="6036000" />
     </task>
     <task id="LOCAL-00001" summary="oprava cesty ku datasete">
       <option name="closed" value="true" />
@@ -264,7 +266,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771931870979</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="konvertovanie ply na glb pre mobil">
+      <option name="closed" value="true" />
+      <created>1772007834393</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1772007834393</updated>
+    </task>
+    <task id="LOCAL-00017" summary="uprava pre zobrazenie progresu">
+      <option name="closed" value="true" />
+      <created>1772010287876</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1772010287876</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -297,7 +315,9 @@
     <MESSAGE value="zmena parametrov pri filtracii" />
     <MESSAGE value="testovanie rôznych parametrov pre DBSCAN" />
     <MESSAGE value="prepojenie pipeline" />
-    <option name="LAST_COMMIT_MESSAGE" value="prepojenie pipeline" />
+    <MESSAGE value="konvertovanie ply na glb pre mobil" />
+    <MESSAGE value="uprava pre zobrazenie progresu" />
+    <option name="LAST_COMMIT_MESSAGE" value="uprava pre zobrazenie progresu" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/diplomova_praca_backend$train_model.coverage" NAME="train_model Coverage Results" MODIFIED="1771232337098" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

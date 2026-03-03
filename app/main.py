@@ -21,7 +21,7 @@ async def upload_video(file: UploadFile = File(...)):
     with open(video_path, "wb") as f:
         f.write(await file.read())
 
-    task = process_video.delay(job_id, str(video_path))
+    task = process_video.delay(job_id, str(video_path), "sparse")
 
     return {
         "job_id": job_id,
