@@ -2,9 +2,7 @@ import open3d as o3d
 import numpy as np
 
 def filter_point_cloud(input_ply: str, output_ply: str):
-    # --------------------------------------------------
-    # 1. Load point cloud
-    # --------------------------------------------------
+    ##načítanie bodov
     pcd = o3d.io.read_point_cloud(input_ply)
     res = pcd.remove_non_finite_points()
     pcd = res[0] if isinstance(res, tuple) else res
@@ -20,15 +18,12 @@ def filter_point_cloud(input_ply: str, output_ply: str):
     extent = pcd.get_axis_aligned_bounding_box().get_extent()
     print("Extent X,Y,Z:", extent)
 
-    # --------------------------------------------------
-    # 2. Remove ground
-    # --------------------------------------------------
+    ##kontrola či points cloud nie je dole hlavou
     points = np.asarray(pcd.points)
 
     y_min = points[:, 1].min()
     y_max = points[:, 1].max()
 
-    #cela plocha
     if y_min < 0:
         length_of_y = abs(y_min) + abs(y_max)
     else:
@@ -41,7 +36,7 @@ def filter_point_cloud(input_ply: str, output_ply: str):
     # hustota bodov spodku vs vrchu
     bottom_density = np.sum(points[:,1] < y_min + y_threshold)
     print("Bottom density before:", bottom_density)
-    top_density = np.sum(points[:,1] >= y_min + y_threshold)
+    top_density = np.sum(points[:,1] >= y_max - y_threshold)
     print("Top density before:", top_density)
 
     if top_density > bottom_density:
@@ -90,9 +85,7 @@ def filter_point_cloud(input_ply: str, output_ply: str):
         print("Avg NN distance:", avg_dist)
     print("Points used for DBSCAN:", len(pcd_work.points))
 
-    # --------------------------------------------------
-    # 4. Clustering (DBSCAN)
-    # --------------------------------------------------
+    ##DBSCAN parametre
     if num_points > MAX_POINTS:
         min_points = 50
     else:
