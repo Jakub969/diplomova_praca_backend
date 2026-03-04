@@ -72,7 +72,7 @@ def predict_pointcloud(model, ply_path, n_points=62673):
 
     with torch.no_grad():
         logits = model(pts_tensor)       # (1, num_classes, N)
-        preds = torch.argmax(logits, dim=1).squeeze(0).cuda().numpy()
+        preds = torch.argmax(logits, dim=1).squeeze(0).cpu().numpy()
 
     return pts, preds
 

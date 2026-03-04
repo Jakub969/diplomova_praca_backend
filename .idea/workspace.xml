@@ -4,10 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="upravy počas testovania">
+    <list default="true" id="42111f80-97b3-4dfb-84ae-595498c9d701" name="Changes" comment="zmena spôsobu kontroly natočenia v DBSCAN">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/DBSCAN.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/DBSCAN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/convert_to_glb.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/tasks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/worker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/full_inference.py" beforeDir="false" afterPath="$PROJECT_DIR$/full_inference.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +144,8 @@
       <workItem from="1772003594656" duration="6843000" />
       <workItem from="1772010890503" duration="40000" />
       <workItem from="1772526281621" duration="6352000" />
-      <workItem from="1772551995439" duration="5250000" />
+      <workItem from="1772551995439" duration="5306000" />
+      <workItem from="1772617118103" duration="8559000" />
     </task>
     <task id="LOCAL-00001" summary="oprava cesty ku datasete">
       <option name="closed" value="true" />
@@ -287,7 +291,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772534877415</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="zmena spôsobu kontroly natočenia v DBSCAN">
+      <option name="closed" value="true" />
+      <created>1772561948115</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1772561948115</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -323,7 +335,8 @@
     <MESSAGE value="konvertovanie ply na glb pre mobil" />
     <MESSAGE value="uprava pre zobrazenie progresu" />
     <MESSAGE value="upravy počas testovania" />
-    <option name="LAST_COMMIT_MESSAGE" value="upravy počas testovania" />
+    <MESSAGE value="zmena spôsobu kontroly natočenia v DBSCAN" />
+    <option name="LAST_COMMIT_MESSAGE" value="zmena spôsobu kontroly natočenia v DBSCAN" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/diplomova_praca_backend$train_model.coverage" NAME="train_model Coverage Results" MODIFIED="1771232337098" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

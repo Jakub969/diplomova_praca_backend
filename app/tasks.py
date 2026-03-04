@@ -3,8 +3,8 @@ import pycolmap
 from pathlib import Path
 import open3d as o3d
 import numpy as np
-
-from convert_to_glb import convert_ply_to_glb
+import aspose.threed as a3d
+from settings import BASE_DIR
 from worker import celery
 from settings import JOBS_DIR, FFMPEG_PATH
 from DBSCAN import filter_point_cloud
@@ -92,18 +92,17 @@ def process_video(self, job_id: str, video_path_str: str, quality: str):
         subprocess.run([
             "docker", "run", "--rm",
             "--gpus", "all",
-            "-v", f"{job_dir}:/workspace/job",
-            "pointnet2_inference:latest",
+            "-v", f"{BASE_DIR}:/workspace",
+            "pointnet2_ready:latest",
             "python", "full_inference.py",
-            "/workspace/job/sparse/filtered_sparse.ply",
-            "/workspace/job/sparse/prediction_sparse.ply",
+            f"/workspace/jobs/{job_id}/sparse/filtered_sparse.ply",
+            f"/workspace/jobs/{job_id}/sparse/prediction_sparse.ply",
             "/workspace/best_pointnet2_model.pth"
         ], check=True)
         update(20)
-        convert_ply_to_glb(
-            sparse_dir / "prediction_sparse.ply",
-            sparse_glb
-        )
+
+        scene = a3d.Scene.from_file(str(sparse_dir / "prediction_sparse.ply"))
+        scene.save(sparse_glb)
         update(10)
     if quality == "dense" and not dense_glb.exists():
         total_progress = 0
@@ -139,17 +138,16 @@ def process_video(self, job_id: str, video_path_str: str, quality: str):
             "docker", "run", "--rm",
             "--gpus", "all",
             "-v", f"{job_dir}:/workspace/job",
-            "pointnet2_inference:latest",
+            "pointnet2_ready:latest",
             "python", "full_inference.py",
             "/workspace/job/dense/filtered_dense.ply",
             "/workspace/job/dense/prediction_dense.ply",
             "/workspace/best_pointnet2_model.pth"
         ], check=True)
         update(10)
-        convert_ply_to_glb(
-            dense_dir / "prediction_dense.ply",
-            dense_glb
-        )
+
+        scene = a3d.Scene.from_file(str(dense_dir / "prediction_sparse.ply"))
+        scene.save(dense_glb)
         update(10)
 
     return {"status": "done"}
