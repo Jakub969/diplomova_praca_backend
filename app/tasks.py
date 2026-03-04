@@ -1,3 +1,5 @@
+import os
+os.environ["DOTNET_SYSTEM_GLOBALIZATION_INVARIANT"] = "1"
 import subprocess
 import pycolmap
 from pathlib import Path
@@ -102,7 +104,7 @@ def process_video(self, job_id: str, video_path_str: str, quality: str):
         update(20)
 
         scene = a3d.Scene.from_file(str(sparse_dir / "prediction_sparse.ply"))
-        scene.save(sparse_glb)
+        scene.save(str(sparse_glb))
         update(10)
     if quality == "dense" and not dense_glb.exists():
         total_progress = 0
