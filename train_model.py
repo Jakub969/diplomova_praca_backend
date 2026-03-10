@@ -21,10 +21,8 @@ import torch.nn.functional as F
 #   HYPERPARAMETRE
 # =====================
 BATCH_SIZE = 2
-LR = 0.0025
-WEIGHT_DECAY = 1e-4
-LR_DECAY_FACTOR = 0.5
-LR_DECAY_STEP = 20
+LR = 0.001
+WEIGHT_DECAY = 1e-3
 EPOCHS = 100
 N_CLASSES = 2
 N_POINTS = 62673
@@ -121,19 +119,22 @@ class CAMA_MLP(nn.Module):
         self.branch1 = nn.Sequential(
             nn.Conv2d(in_channels, 64, 1),
             nn.BatchNorm2d(64),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.Dropout(0.2)
         )
 
         self.branch2 = nn.Sequential(
             nn.Conv2d(in_channels, 128, 1),
             nn.BatchNorm2d(128),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.Dropout(0.2)
         )
 
         self.branch3 = nn.Sequential(
             nn.Conv2d(in_channels, 256, 1),
             nn.BatchNorm2d(256),
-            nn.ReLU()
+            nn.ReLU(),
+            nn.Dropout(0.2)
         )
 
         self.ca1 = ChannelAttention(64)
@@ -141,8 +142,9 @@ class CAMA_MLP(nn.Module):
         self.ca3 = ChannelAttention(256)
 
         self.fuse = nn.Sequential(
-            nn.Conv2d(64+128+256, out_channels, 1),
+            nn.Conv2d(64 + 128 + 256, out_channels, 1),
             nn.BatchNorm2d(out_channels),
+            nn.Dropout(0.3),
             nn.ReLU()
         )
 
@@ -296,9 +298,35 @@ test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False)
 #   TRÉNING
 # =====================
 model = PointNet2SemSegMSG(num_classes=N_CLASSES).to(device)
-criterion = nn.CrossEntropyLoss(weight=torch.tensor([1.0,3.0]).to(device))##criterion = nn.CrossEntropyLoss()
+# =====================
+#   COMPUTE CLASS WEIGHTS FROM TRAINING DATA
+# =====================
+print("Computing class weights from training data...")
+
+# Collect all labels from training dataset
+all_training_labels = []
+for idx in range(len(train_ds)):
+    _, labels = train_ds[idx]  # Get pts, labels
+    all_training_labels.extend(labels.numpy())
+
+# Convert to numpy array
+all_training_labels = np.array(all_training_labels)
+
+class_counts = np.bincount(all_training_labels)
+weights = (1.0 / class_counts) ** 2
+weights = weights / weights.sum() * len(class_counts)
+print("Weights: ", weights)
+
+# Create weighted loss function
+criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights).float().to(device))##criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=LR_DECAY_STEP, gamma=LR_DECAY_FACTOR)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer,
+    mode='min',
+    factor=0.5,
+    patience=2,  # Reduce LR after 2 epochs of no improvement
+    min_lr=1e-6
+)
 
 train_losses, val_losses = [], []
 train_accs, val_accs = [], []
@@ -318,6 +346,7 @@ for epoch in range(EPOCHS):
         outputs = model(pts)
         loss = criterion(outputs, labels)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
         running_loss += loss.item()
 
@@ -359,7 +388,7 @@ for epoch in range(EPOCHS):
     val_recalls.append(recall_score(val_labels_all, val_preds, average='binary', zero_division=0))
     val_f1s.append(f1_score(val_labels_all, val_preds, average='binary', zero_division=0))
 
-    scheduler.step()
+    scheduler.step(avg_val_loss)
 
     print(f"Epoch {epoch+1}: "
           f"Train Loss={avg_train_loss:.4f}, Val Loss={avg_val_loss:.4f}, "
@@ -378,10 +407,10 @@ for epoch in range(EPOCHS):
           "train_f1s": train_f1s,
           "val_f1s": val_f1s
         }
-        torch.save(metrics, "training_metrics_modified.pt")
+        torch.save(metrics, "training_metrics_modified_2.pt")
 
         torch.save(model.state_dict(),
-                   "best_pointnet2_model_modified.pth")
+                   "best_pointnet2_model_modified_2.pth")
         print(f"Best model saved at epoch {epoch+1} with val loss {avg_val_loss:.4f}")
 
 # =====================
@@ -444,5 +473,5 @@ axs[1, 1].legend()
 axs[1, 1].grid(True)
 
 plt.tight_layout()
-plt.savefig("metrics_plot_modified.png", dpi=300)
+plt.savefig("metrics_plot_modified_2.png", dpi=300)
 plt.show()
